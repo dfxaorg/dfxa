@@ -21,9 +21,9 @@ current documentation.
    check, service finder test. Branch protection requires them, plus the
    other expert's approval (`docs/repository-setup.md`).
 2. Workers Builds builds every pushed branch. For branches other than `main`
-   it uploads a **preview** to `https://dev.dfxa.at` (section 3a), marked
-   `X-Robots-Tag: noindex` (public, no login), without changing
-   the live site. Previews may contain draft text (`TODO`).
+   it uploads a **preview** to `https://dev-dfxa.dfxa.workers.dev` (section 3a),
+   marked `X-Robots-Tag: noindex` (public, no login), without changing the
+   live site. Previews may contain draft text (`TODO`).
 3. After merging, Workers Builds builds `main` with
    `sh scripts/build-cloudflare.sh` and deploys it to `dfxa.at`. The build
    fails, and nothing is deployed, if the language parity check, the Hugo
@@ -57,7 +57,7 @@ Documentation: <https://developers.cloudflare.com/workers/ci-cd/builds/>
   | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` | `1` | Browser tests run in GitHub Actions, not in Workers Builds |
 
 - [ ] Settings → Build → Branch control: enable preview builds for
-      non-production branches (needed for `dev.dfxa.at`, section 3a).
+      non-production branches (needed for the preview, section 3a).
 
 ## 3. Custom domain and redirects
 
@@ -87,26 +87,23 @@ Documentation: <https://developers.cloudflare.com/workers/configuration/routing/
     Bulk Redirect list with all four source hostnames.
 - [ ] `/de/` → `/` is handled by `static/_redirects`.
 
-## 3a. Previews on dev.dfxa.at
+## 3a. Previews on workers.dev
 
-Documentation: <https://developers.cloudflare.com/workers/previews/custom-domains/>
+Documentation: <https://developers.cloudflare.com/workers/previews/>
 
-Previews are served by the same Worker on `<preview name>.dfxa.at`. The
-preview command names the preview `dev`, so the latest push to any branch
-other than `main` is at `https://dev.dfxa.at` (it also appears as
-`dev-dfxa.<account>.workers.dev`). Previews skip the TODO guard and show
-draft text, including the legal notice and privacy policy. They are public
-(decided 19 October 2026, no Cloudflare Access): anyone who opens
-`dev.dfxa.at` can read them; search engines are told not to index them.
-- [ ] Domain for previews: `wrangler.jsonc` sets `"previews_enabled": true`
-      on `dfxa.at`; it takes effect with the first production deployment.
-      Until launch, add it in the dashboard instead: Worker → Domains → Add
-      Domain → `dfxa.at`, Enable for **Preview** (this does not make
-      `dfxa.at` live). Cloudflare creates a wildcard record `*.dfxa.at` and
-      its certificate; existing records such as `www` take precedence.
-- [ ] Check: `curl -sI https://dev.dfxa.at/` shows `X-Robots-Tag: noindex`
-      (custom domain previews, unlike `workers.dev`, do not add it
-      themselves; the build script does).
+Previews are served by the same Worker on `workers.dev`. The preview command
+names the preview `dev`, so the latest push to any branch other than `main`
+is at `https://dev-dfxa.dfxa.workers.dev` (account subdomain `dfxa`, Worker `dfxa`).
+Previews skip the TODO guard and show draft text, including the legal notice
+and privacy policy. They are public (decided 19 October 2026, no Cloudflare
+Access): anyone with the URL can read them. Cloudflare marks `workers.dev`
+previews `X-Robots-Tag: noindex`, and so does the build script.
+
+- [ ] Preview URLs on: `wrangler.jsonc` sets `"preview_urls": true`; it
+      takes effect with the first production deployment. Until launch, turn
+      it on in the dashboard: Worker → Domains → Worker URL → **Preview** on
+      (leave the production `workers.dev` URL off).
+- [ ] Check: `curl -sI https://dev-dfxa.dfxa.workers.dev/` shows `X-Robots-Tag: noindex`.
 
 ## 4. Zone settings (privacy and no third-party content)
 
