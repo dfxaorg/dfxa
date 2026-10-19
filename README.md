@@ -107,6 +107,6 @@ then builds `main` with `sh scripts/build-cloudflare.sh` and deploys it to
 `dfxa.at`; the build stops if the language or SEO checks fail, and the deploy
 if the TODO check fails, so a page with a `TODO` marker is never published
 (open items: `docs/open-items.md`). Other branches get a non-indexed preview
-on `dev.dfxa.at`, behind Cloudflare Access. External
+on `dev.dfxa.at`. External
 links are checked weekly by `.github/workflows/linkcheck-external.yml`.
 Setup: `docs/cloudflare.md`, `docs/dns.md`, `docs/repository-setup.md`.

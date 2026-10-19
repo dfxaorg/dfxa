@@ -22,7 +22,7 @@ current documentation.
    other expert's approval (`docs/repository-setup.md`).
 2. Workers Builds builds every pushed branch. For branches other than `main`
    it uploads a **preview** to `https://dev.dfxa.at` (section 3a), marked
-   `X-Robots-Tag: noindex` and behind Cloudflare Access, without changing
+   `X-Robots-Tag: noindex` (public, no login), without changing
    the live site. Previews may contain draft text (`TODO`).
 3. After merging, Workers Builds builds `main` with
    `sh scripts/build-cloudflare.sh` and deploys it to `dfxa.at`. The build
@@ -89,29 +89,24 @@ Documentation: <https://developers.cloudflare.com/workers/configuration/routing/
 
 ## 3a. Previews on dev.dfxa.at
 
-Documentation: <https://developers.cloudflare.com/workers/previews/custom-domains/>,
-<https://developers.cloudflare.com/workers/configuration/cloudflare-access/>
+Documentation: <https://developers.cloudflare.com/workers/previews/custom-domains/>
 
 Previews are served by the same Worker on `<preview name>.dfxa.at`. The
 preview command names the preview `dev`, so the latest push to any branch
 other than `main` is at `https://dev.dfxa.at` (it also appears as
 `dev-dfxa.<account>.workers.dev`). Previews skip the TODO guard and show
-draft text, including the legal notice and privacy policy, so only the
-experts may open them.
-
-- [ ] **Access first**, before the first preview build: Worker `dfxa` →
-      Access → Protect this Worker behind Access → **Previews only** →
-      policy: emails of both experts (login by one-time PIN). The live site
-      `dfxa.at` stays public.
+draft text, including the legal notice and privacy policy. They are public
+(decided 19 October 2026, no Cloudflare Access): anyone who opens
+`dev.dfxa.at` can read them; search engines are told not to index them.
 - [ ] Domain for previews: `wrangler.jsonc` sets `"previews_enabled": true`
       on `dfxa.at`; it takes effect with the first production deployment.
       Until launch, add it in the dashboard instead: Worker → Domains → Add
       Domain → `dfxa.at`, Enable for **Preview** (this does not make
       `dfxa.at` live). Cloudflare creates a wildcard record `*.dfxa.at` and
       its certificate; existing records such as `www` take precedence.
-- [ ] Check: `https://dev.dfxa.at` asks for the Access login; after login,
-      the Network tab shows `X-Robots-Tag: noindex` (custom domain
-      previews, unlike `workers.dev`, do not add it themselves).
+- [ ] Check: `curl -sI https://dev.dfxa.at/` shows `X-Robots-Tag: noindex`
+      (custom domain previews, unlike `workers.dev`, do not add it
+      themselves; the build script does).
 
 ## 4. Zone settings (privacy and no third-party content)
 

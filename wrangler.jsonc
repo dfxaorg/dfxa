@@ -14,7 +14,7 @@
   // www.dfxa.at, dfxa.eu and dfxa.org redirect via Cloudflare Redirect Rules.
   "workers_dev": false,
   // Previews of non-main branches on *.workers.dev and <preview>.dfxa.at
-  // (dev.dfxa.at), behind Cloudflare Access and noindex (see build script);
+  // (dev.dfxa.at), public but noindex (see build script);
   // with workers_dev off they are disabled unless enabled explicitly.
   "preview_urls": true,
   "previews": {},
