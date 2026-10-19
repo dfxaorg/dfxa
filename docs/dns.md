@@ -51,8 +51,9 @@ In each zone:
 ## 4. dfxa.at – mail (Cloudflare Email Routing)
 
 `contact@dfxa.at` is a forwarding address: each enquiry is delivered to both
-experts' own mailboxes by the Email Worker `dfxa-mail`; there is no shared
-mailbox (see the privacy policy).
+experts' own mailboxes by the Email Worker `dfxa-mail-forwarder`
+(`docs/cloudflare.md`, section 6); there is no shared mailbox (see the
+privacy policy).
 
 When Email Routing is enabled for `dfxa.at`, Cloudflare adds these records
 (accept them in the dashboard):

@@ -5,7 +5,8 @@ assets** (`wrangler.jsonc`), built and deployed by **Cloudflare Workers
 Builds** (Git integration with the GitHub repository `dfxaorg/dfxa`). The
 domains `dfxa.at`, `dfxa.eu` and `dfxa.org` are registered with and managed
 in Cloudflare. Mail to `contact@dfxa.at` is handled by **Cloudflare Email
-Routing** and a small Email Worker (`workers/mail/`).
+Routing** and the Email Worker `dfxa-mail-forwarder`, which is managed in the
+Cloudflare dashboard, not in this repository (section 6).
 
 Checked against the Cloudflare documentation source
 (`cloudflare/cloudflare-docs`) on 16 October 2026. Menu names in the
@@ -20,15 +21,15 @@ current documentation.
    check, service finder test. Branch protection requires them, plus the
    other expert's approval (`docs/repository-setup.md`).
 2. Workers Builds builds every pushed branch. For branches other than `main`
-   it uploads a **preview** (a preview URL on `workers.dev`, marked
-   `X-Robots-Tag: noindex`) without changing the live site. Like production
-   builds, previews fail while published files contain `TODO`.
+   it uploads a **preview** to `https://dev.dfxa.at` (section 3a), marked
+   `X-Robots-Tag: noindex` and behind Cloudflare Access, without changing
+   the live site. Previews may contain draft text (`TODO`).
 3. After merging, Workers Builds builds `main` with
    `sh scripts/build-cloudflare.sh` and deploys it to `dfxa.at`. The build
    fails, and nothing is deployed, if the language parity check, the Hugo
-   build, the SEO check or the TODO guard (no `TODO` in published files)
-   fails. The TODO guard runs on every branch, so a wrongly configured
-   production branch cannot publish draft text either.
+   build or the SEO check fails. The deploy command runs the TODO guard (no
+   `TODO` in published files) before `wrangler deploy`, so every production
+   deployment is guarded, even with a wrongly configured production branch.
 
 ## 2. Create the Worker and connect the repository
 
@@ -44,8 +45,8 @@ Documentation: <https://developers.cloudflare.com/workers/ci-cd/builds/>
   | Worker name | `dfxa` (must match `name` in `wrangler.jsonc`) |
   | Production branch | `main` (check this: Cloudflare proposes the repository's default branch) |
   | Build command | `sh scripts/build-cloudflare.sh` |
-  | Deploy command | `npx wrangler deploy` |
-  | Preview command | default (`npx wrangler preview`) |
+  | Deploy command | `sh scripts/check-no-todo.sh && npx wrangler deploy` |
+  | Preview command | `npx wrangler preview --name dev` |
   | Root directory | `/` |
 
 - [ ] Build variables (Settings → Build → Variables and secrets):
@@ -56,7 +57,7 @@ Documentation: <https://developers.cloudflare.com/workers/ci-cd/builds/>
   | `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` | `1` | Browser tests run in GitHub Actions, not in Workers Builds |
 
 - [ ] Settings → Build → Branch control: enable preview builds for
-      non-production branches (optional, useful for reviewing pull requests).
+      non-production branches (needed for `dev.dfxa.at`, section 3a).
 
 ## 3. Custom domain and redirects
 
@@ -85,6 +86,32 @@ Documentation: <https://developers.cloudflare.com/workers/configuration/routing/
     query string (same for `dfxa.org`). Alternatively one account-level
     Bulk Redirect list with all four source hostnames.
 - [ ] `/de/` → `/` is handled by `static/_redirects`.
+
+## 3a. Previews on dev.dfxa.at
+
+Documentation: <https://developers.cloudflare.com/workers/previews/custom-domains/>,
+<https://developers.cloudflare.com/workers/configuration/cloudflare-access/>
+
+Previews are served by the same Worker on `<preview name>.dfxa.at`. The
+preview command names the preview `dev`, so the latest push to any branch
+other than `main` is at `https://dev.dfxa.at` (it also appears as
+`dev-dfxa.<account>.workers.dev`). Previews skip the TODO guard and show
+draft text, including the legal notice and privacy policy, so only the
+experts may open them.
+
+- [ ] **Access first**, before the first preview build: Worker `dfxa` →
+      Access → Protect this Worker behind Access → **Previews only** →
+      policy: emails of both experts (login by one-time PIN). The live site
+      `dfxa.at` stays public.
+- [ ] Domain for previews: `wrangler.jsonc` sets `"previews_enabled": true`
+      on `dfxa.at`; it takes effect with the first production deployment.
+      Until launch, add it in the dashboard instead: Worker → Domains → Add
+      Domain → `dfxa.at`, Enable for **Preview** (this does not make
+      `dfxa.at` live). Cloudflare creates a wildcard record `*.dfxa.at` and
+      its certificate; existing records such as `www` take precedence.
+- [ ] Check: `https://dev.dfxa.at` asks for the Access login; after login,
+      the Network tab shows `X-Robots-Tag: noindex` (custom domain
+      previews, unlike `workers.dev`, do not add it themselves).
 
 ## 4. Zone settings (privacy and no third-party content)
 
@@ -127,20 +154,17 @@ printf '%s' 'document.documentElement.classList.add("js")' | openssl dgst -sha25
 Documentation: <https://developers.cloudflare.com/email-service/>
 
 An Email Routing rule can forward to only one destination; to deliver each
-enquiry to both experts, the rule sends mail to the Email Worker
-`workers/mail/src/index.js`, which forwards it to every address in the
-secret `FORWARD_TO`.
+enquiry to both experts, the rule for `contact@dfxa.at` sends mail to the
+Email Worker `dfxa-mail-forwarder`, which forwards it to both experts' own
+mailboxes. The Worker is independent of the website: it is edited in the
+dashboard (Workers & Pages → `dfxa-mail-forwarder`) and not deployed from
+this repository.
 
-- [ ] Email Routing → enable for `dfxa.at`; Cloudflare adds the MX and SPF
-      records (see `docs/dns.md`).
-- [ ] Destination addresses: add both experts' own mailbox addresses and have
-      each expert confirm the verification email.
-- [ ] Create the Worker `dfxa-mail`: Workers & Pages → Create → Import a
-      repository → `dfxaorg/dfxa`, root directory `workers/mail`, no build
-      command, deploy command `npx wrangler deploy`.
-- [ ] Worker `dfxa-mail` → Settings → Variables and secrets → add **secret**
-      `FORWARD_TO` = `<address 1>,<address 2>` (not stored in the repository).
-- [ ] Email Routing → Routing rules → custom address `contact@dfxa.at` →
-      action **Send to a Worker** → `dfxa-mail`.
-- [ ] Catch-all: drop (do not forward other addresses).
+- [x] Email Routing enabled for `dfxa.at`; MX, SPF and DKIM records present
+      (see `docs/dns.md`).
+- [x] Rule `contact@dfxa.at` → **Send to a Worker** → `dfxa-mail-forwarder`.
+- [ ] Destination addresses: both experts' mailboxes added; each expert must
+      confirm the verification email (Email Routing → Destination
+      addresses). Forwarding to an unverified address fails.
+- [x] Catch-all disabled: mail to other addresses is rejected.
 - [ ] Test (see `docs/dns.md`, section 4).

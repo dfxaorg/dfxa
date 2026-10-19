@@ -1,9 +1,9 @@
 # Open items before launch
 
 Status: 14 October 2026. `scripts/list-todos.sh` lists all `TODO` markers
-in the repository. The deployment workflow refuses to publish while any
-built file still contains `TODO` (`scripts/build-cloudflare.sh`,
-`scripts/check-no-todo.sh`).
+in the repository. The production deployment refuses to publish while any
+built file still contains `TODO` (`scripts/check-no-todo.sh` in the Workers
+Builds deploy command, `docs/cloudflare.md`); previews may show drafts.
 
 ## Bernhard Haslhofer
 
@@ -26,8 +26,9 @@ confirmed by Johann Stockinger in the PR review.
 - [ ] Background paragraph (DE and EN) and portrait.
 - [x] Mail forwarding provider: Cloudflare Email Routing (decided 16 October
       2026).
-- [ ] Own mailbox addresses of both experts as forwarding targets (Worker
-      secret `FORWARD_TO`, verified destination addresses).
+- [ ] Own mailbox addresses of both experts as forwarding targets: set in
+      `dfxa-mail-forwarder`; destination address still to be verified by
+      Bernhard Haslhofer.
 - [x] robots.txt policy confirmed (all crawlers allowed, 16 October 2026).
 - [ ] Cloudflare setup (`docs/cloudflare.md`) and DNS records (`docs/dns.md`).
 - [ ] Approve the shared pages (home, about, legal notice, privacy) – required

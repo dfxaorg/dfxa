@@ -1,11 +1,13 @@
 #!/bin/sh
 # Build command for Cloudflare Workers Builds (see docs/cloudflare.md).
 #
-# Language parity, Hugo build, SEO check and the TODO guard must all pass,
-# otherwise the build fails and nothing is deployed. The TODO guard runs on
-# every branch, so draft text cannot go live even if the Cloudflare project's
-# production branch is set to a branch other than main. Builds of branches
-# other than main are marked noindex so that previews are not indexed.
+# Language parity, Hugo build and SEO check must all pass, otherwise the build
+# fails and nothing is deployed. The TODO guard is not run here but in the
+# deploy command (sh scripts/check-no-todo.sh && npx wrangler deploy), so it
+# blocks every production deployment, whichever branch is the production
+# branch, while previews (behind Cloudflare Access) may show draft text.
+# Builds of branches other than main are marked noindex so that previews are
+# not indexed.
 # Requires the build variable HUGO_VERSION=0.166.0 (Hugo extended).
 set -eu
 cd "$(dirname "$0")/.."
@@ -17,8 +19,6 @@ hugo version
 node scripts/check-language-parity.mjs
 hugo --gc
 node scripts/check-seo.mjs
-
-sh scripts/check-no-todo.sh
 
 branch="${WORKERS_CI_BRANCH:-}"
 if [ "$branch" != "main" ]; then

@@ -32,7 +32,6 @@ party (see "Content rules" below).
 | `assets/` | CSS and JS processed by Hugo Pipes |
 | `wrangler.jsonc` | Cloudflare Worker configuration (static assets, custom domain `dfxa.at`) |
 | `static/_headers`, `static/_redirects` | Security headers (CSP, HSTS, …) and redirects on Cloudflare |
-| `workers/mail/` | Email Worker forwarding contact@dfxa.at to both experts |
 | `scripts/check-language-parity.mjs` | CI check: every content file and i18n key in both languages |
 | `docs/` | Operational documentation (repository settings, DNS, SEO, data file, admission of experts) |
 
@@ -105,8 +104,9 @@ Pull requests and pushes to `main` run the checks in
 check, accessibility, Content-Security-Policy and service finder tests);
 branch protection requires them before merging. Cloudflare Workers Builds
 then builds `main` with `sh scripts/build-cloudflare.sh` and deploys it to
-`dfxa.at`; the build stops if the language, SEO or TODO checks fail, so a
-page with a `TODO` marker is never published (open items:
-`docs/open-items.md`). Other branches get a non-indexed preview. External
+`dfxa.at`; the build stops if the language or SEO checks fail, and the deploy
+if the TODO check fails, so a page with a `TODO` marker is never published
+(open items: `docs/open-items.md`). Other branches get a non-indexed preview
+on `dev.dfxa.at`, behind Cloudflare Access. External
 links are checked weekly by `.github/workflows/linkcheck-external.yml`.
 Setup: `docs/cloudflare.md`, `docs/dns.md`, `docs/repository-setup.md`.

@@ -13,11 +13,12 @@
   // The site is served only on dfxa.at (no duplicate under *.workers.dev).
   // www.dfxa.at, dfxa.eu and dfxa.org redirect via Cloudflare Redirect Rules.
   "workers_dev": false,
-  // Previews of non-main branches on *.workers.dev (noindex, see build script);
+  // Previews of non-main branches on *.workers.dev and <preview>.dfxa.at
+  // (dev.dfxa.at), behind Cloudflare Access and noindex (see build script);
   // with workers_dev off they are disabled unless enabled explicitly.
   "preview_urls": true,
   "previews": {},
   "routes": [
-    { "pattern": "dfxa.at", "custom_domain": true }
+    { "pattern": "dfxa.at", "custom_domain": true, "previews_enabled": true }
   ]
 }
