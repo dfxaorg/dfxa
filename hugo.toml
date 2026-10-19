@@ -27,6 +27,45 @@ disablePathToLower = false
   audience = "audiences"
   domain = "domains"
 
+# Public data file /services.json and /en/services.json (see docs/services-json.md).
+# It also feeds the client-side filters of the service finder.
+[outputFormats.services]
+  mediaType = "application/json"
+  baseName = "services"
+  isPlainText = true
+  notAlternative = true
+  permalinkable = false
+
+# Markdown alternates of profile and service pages (index.md next to
+# index.html) and llms.txt / llms-full.txt per language, for AI assistants.
+[mediaTypes."text/markdown"]
+  suffixes = ["md"]
+
+[outputFormats.markdown]
+  mediaType = "text/markdown"
+  baseName = "index"
+  isPlainText = true
+  rel = "alternate"
+
+[outputFormats.llms]
+  mediaType = "text/plain"
+  baseName = "llms"
+  isPlainText = true
+  notAlternative = true
+
+[outputFormats.llmsfull]
+  mediaType = "text/plain"
+  baseName = "llms-full"
+  isPlainText = true
+  notAlternative = true
+
+[outputs]
+  home = ["html", "services", "llms", "llmsfull"]
+
+[sitemap]
+  changeFreq = ""
+  priority = -1
+
 [params]
   contactEmail = "contact@dfxa.at"
   # Shown next to the short form in the header and in the legal notice.

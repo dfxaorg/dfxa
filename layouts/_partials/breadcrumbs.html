@@ -1,0 +1,10 @@
+{{- /* Visible breadcrumbs: Home › parent section/taxonomy › current page. */ -}}
+<nav class="breadcrumbs" aria-label="{{ T "breadcrumb_label" }}">
+  <ol>
+    <li><a href="{{ site.Home.RelPermalink }}">{{ T "breadcrumb_home" }}</a></li>
+    {{- with .Parent }}{{ if not .IsHome }}
+    <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+    {{- end }}{{ end }}
+    <li><span aria-current="page">{{ .LinkTitle }}</span></li>
+  </ol>
+</nav>

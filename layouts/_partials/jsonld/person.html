@@ -1,0 +1,49 @@
+{{- /* schema.org Person for an expert page. Params: page, full (bool; false =
+       reference with @id, name and url only). Returns a dict. */ -}}
+{{- $p := .page }}
+{{- $person := dict "@type" "Person" "@id" (printf "%s#person" $p.Permalink) "name" (partial "expert-name.html" $p) "url" $p.Permalink }}
+{{- if .full }}
+{{- with $p.Params.honorific_prefix }}{{ $person = merge $person (dict "honorificPrefix" .) }}{{ end }}
+{{- with $p.Params.given_name }}{{ $person = merge $person (dict "givenName" .) }}{{ end }}
+{{- with $p.Params.family_name }}{{ $person = merge $person (dict "familyName" .) }}{{ end }}
+{{- with $p.Params.role }}{{ $person = merge $person (dict "jobTitle" (strings.FirstUpper .)) }}{{ end }}
+{{- $person = merge $person (dict "email" ($p.Params.email | default site.Params.contactEmail)) }}
+{{- with $p.Params.phone }}{{ $person = merge $person (dict "telephone" .) }}{{ end }}
+{{- with $p.Resources.GetMatch "portrait.*" }}
+{{- $img := .Fill "600x600 webp q80 Center" }}
+{{- $person = merge $person (dict "image" $img.Permalink) }}
+{{- end }}
+{{- with $p.Params.address }}
+{{- $person = merge $person (dict "address" (dict "@type" "PostalAddress" "addressLocality" .locality "addressCountry" .country)) }}
+{{- end }}
+{{- $knows := slice }}
+{{- range $p.GetTerms "domains" }}{{ $knows = $knows | append .LinkTitle }}{{ end }}
+{{- range $p.GetTerms "services" }}{{ $knows = $knows | append .LinkTitle }}{{ end }}
+{{- with $knows }}{{ $person = merge $person (dict "knowsAbout" .) }}{{ end }}
+{{- with $p.Params.languages }}{{ $person = merge $person (dict "knowsLanguage" .) }}{{ end }}
+{{- $creds := slice }}
+{{- with $p.Params.court_certification }}
+{{- $c := dict
+  "@type" "EducationalOccupationalCredential"
+  "name" (strings.FirstUpper $p.Params.role)
+  "credentialCategory" (T "credential_category")
+  "competencyRequired" (partial "court-fields.html" $p)
+  "recognizedBy" (dict "@type" "GovernmentOrganization" "name" (T "credential_recognized_by"))
+  "identifier" .list_number
+  "url" .url }}
+{{- $creds = $creds | append $c }}
+{{- end }}
+{{- range $p.Params.other_certifications }}
+{{- $c := dict "@type" "EducationalOccupationalCredential" "name" .name }}
+{{- with .issuer }}{{ $c = merge $c (dict "recognizedBy" (dict "@type" "Organization" "name" .)) }}{{ end }}
+{{- with .url }}{{ $c = merge $c (dict "url" .) }}{{ end }}
+{{- $creds = $creds | append $c }}
+{{- end }}
+{{- with $creds }}{{ $person = merge $person (dict "hasCredential" .) }}{{ end }}
+{{- $same := slice }}
+{{- with $p.Params.website }}{{ $same = $same | append . }}{{ end }}
+{{- with $p.Params.court_certification }}{{ with .url }}{{ $same = $same | append . }}{{ end }}{{ end }}
+{{- range $p.Params.same_as }}{{ $same = $same | append . }}{{ end }}
+{{- with $same }}{{ $person = merge $person (dict "sameAs" .) }}{{ end }}
+{{- end }}
+{{- return $person -}}

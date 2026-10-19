@@ -1,0 +1,35 @@
+{{- /* /llms.txt (DE) and /en/llms.txt (EN): summary for AI assistants,
+       following https://llmstxt.org/. Generated from the content. */ -}}
+{{- $other := index .Translations 0 -}}
+# {{ T "site_name" }} – {{ T "site_suffix" }} ({{ T "site_short" }})
+
+> {{ T "site_description" }}
+
+{{ .Content | plainify | htmlUnescape | strings.TrimSpace }}
+
+{{ T "llms_other_language" }}: {{ with $other }}{{ (.OutputFormats.Get "llms").Permalink }}{{ end }}
+
+## {{ T "llms_disclaimer_heading" }}
+
+{{ T "disclaimer" }}
+
+## {{ T "llms_contact_heading" }}
+
+{{ site.Params.contactEmail }} – {{ T "contact_note" }}
+
+## {{ T "llms_experts_heading" }}
+
+{{ range partial "sorted-experts.html" (site.GetPage "/experts").Pages -}}
+- [{{ .Title }}]({{ .Permalink }}): {{ delimit (partial "profile-intro.html" .) " " }}
+{{ end }}
+## {{ T "llms_services_heading" }}
+
+{{ range (site.GetPage "/services").Pages.ByWeight -}}
+{{- $names := slice }}{{ range partial "sorted-experts.html" .Pages }}{{ $names = $names | append (partial "expert-name.html" .) }}{{ end -}}
+- [{{ .Title }}]({{ .Permalink }}): {{ .Description }} ({{ T "llms_offered_by" }}: {{ delimit $names ", " }})
+{{ end }}
+## {{ T "llms_data_heading" }}
+
+- [services.json]({{ (.OutputFormats.Get "services").Permalink }}): {{ T "llms_data_json" }}
+- [llms-full.txt]({{ (.OutputFormats.Get "llmsfull").Permalink }}): {{ T "llms_data_full" }}
+- {{ T "llms_data_markdown" }}

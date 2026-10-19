@@ -1,0 +1,9 @@
+{{- /* Court-certified fields of an expert for running text and cards, e.g.
+       „Forensische Datensicherung, …“ (68.62, nur für Kryptowährungsforensik).
+       Returns a slice of strings. */ -}}
+{{- $out := slice }}
+{{- with .Params.court_certification }}{{ range .fields }}
+{{- $d := dict "Name" .name "Number" (.number | default "–") "Restriction" .restriction }}
+{{- $out = $out | append (T (cond (ne (.restriction | default "") "") "court_field_inline_restricted" "court_field_inline") $d) }}
+{{- end }}{{ end }}
+{{- return $out -}}

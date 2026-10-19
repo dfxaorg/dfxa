@@ -5,7 +5,6 @@ site_name = "Digital Forensics Austria"
 site_short = "DFXA"
 site_suffix = "Network of Independent Experts"
 site_title_suffix = "DFXA Digital Forensics Austria"
-home_link_label = "Startseite: Digital Forensics Austria – Network of Independent Experts"
 
 skip_to_content = "Zum Inhalt springen"
 nav_main_label = "Hauptnavigation"
@@ -29,9 +28,109 @@ last_updated = "Zuletzt aktualisiert"
 notfound_title = "Seite nicht gefunden"
 notfound_text = "Die angeforderte Seite existiert nicht oder wurde verschoben."
 notfound_home = "Zur Startseite"
-# The 404 page is served for both languages by GitHub Pages (/404.html),
-# so it also carries the text of the other language.
+# The 404 page also carries the text of the other language, so that a
+# visitor who mistyped a URL finds both home pages.
 notfound_alt_lang = "en"
 notfound_alt_title = "Page not found"
 notfound_alt_text = "The requested page does not exist or has been moved."
 notfound_alt_home = "Go to the English home page"
+
+# --- Breadcrumbs, dates -------------------------------------------------------
+breadcrumb_label = "Brotkrumennavigation"
+breadcrumb_home = "Startseite"
+
+# --- Expert profile -----------------------------------------------------------
+# Placeholders: .Name, .Role, .Fields, .ListNumber, .City, .Languages
+profile_intro_cert = "{{ .Name }} ist {{ .Role }} für {{ .Fields }}, eingetragen in der Gerichtssachverständigenliste unter der Nummer {{ .ListNumber }}."
+profile_intro_location = "{{ .Name }} ist in {{ .City }} tätig; Arbeitssprachen sind {{ .Languages }}."
+profile_services = "Leistungen"
+profile_court_certification = "Gerichtliche Zertifizierung"
+profile_cert_fields = "Fachgebiete laut Gerichtssachverständigenliste"
+profile_cert_list_number = "Listennummer"
+profile_cert_link = "Eintrag in der Gerichtssachverständigenliste (JustizOnline)"
+profile_other_certifications = "Weitere Zertifizierungen"
+profile_contact = "Kontakt"
+profile_own_email = "Eigene E-Mail-Adresse"
+profile_phone = "Telefon"
+profile_website = "Website"
+profile_portrait_alt = "Porträt von {{ .Name }}"
+list_and = "und"
+lang_de = "Deutsch"
+lang_en = "Englisch"
+
+# --- Contact ------------------------------------------------------------------
+# Subject lines of prefilled mailto links. Placeholders: .Name, .Service
+contact_subject_expert = "Anfrage an {{ .Name }}"
+contact_subject_expert_service = "Anfrage an {{ .Name }}: {{ .Service }}"
+contact_subject_service = "Anfrage: {{ .Service }}"
+contact_expert = "{{ .Name }} kontaktieren"
+contact_jump = "Kontaktadresse und Hinweis zur Weiterleitung"
+
+# --- Experts list, cards ------------------------------------------------------
+experts_profile_link = "Profil von {{ .Name }}"
+card_court_fields = "Gerichtlich zertifiziert für"
+card_services = "Leistungen"
+
+# --- Services -----------------------------------------------------------------
+service_audiences = "Wer beauftragt diese Leistung typischerweise?"
+service_result = "Ergebnis"
+service_experts = "Sachverständige für diese Leistung"
+service_experts_intro = "Die folgenden Sachverständigen des Netzwerks bieten diese Leistung an. Die Reihenfolge ist alphabetisch nach Nachnamen."
+service_domain = "Fachgebiet"
+services_offered_by = "Angeboten von"
+services_finder_intro = "Leistungen nach Fachgebiet. Jede Leistung führt zu den Sachverständigen, die sie anbieten."
+
+# --- Taxonomy terms (domains, audiences) --------------------------------------
+term_experts = "Sachverständige"
+term_services = "Leistungen"
+
+# --- Home ---------------------------------------------------------------------
+home_finder_heading = "Passende Sachverständige finden"
+home_finder_text = "Wählen Sie eine Leistung, um die Sachverständigen zu sehen, die sie anbieten."
+home_finder_link = "Zu den Leistungen"
+home_experts_heading = "Die Sachverständigen des Netzwerks"
+home_disclaimer_heading = "Hinweis"
+
+# --- Court certification fields -------------------------------------------------
+# Placeholders: .Name, .Number, .Restriction, .Date
+court_field_inline = "„{{ .Name }}“ ({{ .Number }})"
+court_field_inline_restricted = "„{{ .Name }}“ ({{ .Number }}, nur für {{ .Restriction }})"
+court_field_restriction = "nur für {{ .Restriction }}"
+court_field_certified_until = "zertifiziert bis {{ .Date }}"
+profile_cert_group = "Fachgruppe"
+
+# --- Service finder filters ------------------------------------------------------
+finder_filter_label = "Leistungen filtern"
+finder_search_label = "Suche in Leistungen"
+finder_search_placeholder = "z. B. Kryptowährung, Gutachten, Ransomware"
+finder_audience_legend = "Für wen?"
+finder_domain_legend = "Fachgebiet"
+finder_reset = "Filter zurücksetzen"
+finder_count_one = "1 Leistung gefunden."
+finder_count_other = "{{ .Count }} Leistungen gefunden."
+finder_none = "Keine Leistung entspricht den gewählten Filtern."
+finder_for = "Für"
+home_search_label = "Leistung suchen"
+home_search_submit = "Suchen"
+
+# --- SEO, structured data, machine-readable formats -------------------------------
+service_faq = "Häufige Fragen"
+og_image_alt = "{{ .Title }} – Digital Forensics Austria, Network of Independent Experts"
+site_alternate_name = "Network of Independent Experts"
+site_description = "Netzwerk unabhängiger, gerichtlich zertifizierter Sachverständiger für IT-Forensik, IT-Sicherheit und Kryptoforensik in Österreich."
+area_served = "Österreich"
+credential_category = "Gerichtliche Zertifizierung als Sachverständige bzw. Sachverständiger"
+credential_recognized_by = "Republik Österreich – Bundesministerium für Justiz"
+llms_other_language = "English version"
+llms_disclaimer_heading = "Hinweis"
+llms_contact_heading = "Kontakt"
+llms_experts_heading = "Sachverständige"
+llms_services_heading = "Leistungen"
+llms_data_heading = "Maschinenlesbare Daten"
+llms_data_json = "Leistungen, Fachgebiete, Zielgruppen und Sachverständige als JSON"
+llms_data_full = "Volltext aller Profil- und Leistungsseiten"
+llms_data_markdown = "Jede Profil- und Leistungsseite ist zusätzlich als Markdown unter <URL>index.md abrufbar."
+llms_offered_by = "angeboten von"
+md_source = "Quelle"
+md_contact_subject = "Betreff"
+md_email = "E-Mail"

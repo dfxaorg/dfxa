@@ -1,11 +1,27 @@
 {{ define "main" }}
+{{- /* Domain and audience term pages: experts and services in this term. */ -}}
 <div class="container">
+  {{ partial "breadcrumbs.html" . }}
   <h1>{{ .Title }}</h1>
   {{ .Content }}
-  {{ with .Pages }}
-  <ul>
-    {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>{{ end }}
+  {{- $term := .Data.Term }}
+  {{- $param := cond (eq .Data.Plural "domains") "domain" "typical_audiences" }}
+  {{- $services := slice }}
+  {{- range (site.GetPage "/services").Pages }}
+  {{- $v := index .Params $param }}
+  {{- if or (eq $v $term) (and (reflect.IsSlice $v) (in $v $term)) }}{{ $services = $services | append . }}{{ end }}
+  {{- end }}
+  {{- with $services }}
+  <h2>{{ T "term_services" }}</h2>
+  <ul class="link-list">
+    {{- range sort . "LinkTitle" }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
   </ul>
-  {{ end }}
+  {{- end }}
+  {{- with partial "sorted-experts.html" .Pages }}
+  <h2>{{ T "term_experts" }}</h2>
+  <div class="card-grid">
+    {{- range . }}{{ partial "expert-card.html" (dict "page" .) }}{{ end }}
+  </div>
+  {{- end }}
 </div>
 {{ end }}

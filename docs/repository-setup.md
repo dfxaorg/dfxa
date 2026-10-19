@@ -3,30 +3,28 @@
 These settings are made in the GitHub web interface by an organisation owner.
 They are not stored in the repository.
 
-The organisation name is referred to as `<org>` below.
-TODO: replace `<org>` once the organisation name has been decided.
+Organisation: `dfxaorg`. Repository: `dfxaorg/dfxa` (transferred from
+`behas/dfxa` on 16 October 2026; GitHub redirects the old URLs).
 
 ## 1. Organisation and repository
 
-- [ ] Create the GitHub organisation `<org>` (not a personal account).
-- [ ] Make both experts organisation **owners**
+- [x] Create the GitHub organisation `dfxaorg` (not a personal account).
+- [x] Make both experts organisation **owners**
       (Organisation → Settings → Member privileges / People → Role: Owner).
-- [ ] Require two-factor authentication for all members
+- [x] Require two-factor authentication for all members
       (Organisation → Settings → Authentication security).
-- [ ] Create the repository `<org>/dfxa.at` and push this repository to it.
+- [x] Transfer the repository from `behas/dfxa` to the organisation
+      (done 16 October 2026).
 
-## 2. GitHub Pages
+## 2. Default branch and hosting
 
-- [ ] Repository → Settings → Pages → Build and deployment → Source:
-      **GitHub Actions**.
-- [ ] After the DNS records in `docs/dns.md` are in place: Settings → Pages →
-      Custom domain: `dfxa.at`, then tick **Enforce HTTPS** once the
-      certificate has been issued.
-- [ ] Verify the domain for the organisation to prevent domain takeover:
-      Organisation → Settings → Pages → Add a domain → `dfxa.at`
-      (requires the TXT record from `docs/dns.md`).
-- [ ] Settings → Environments → `github-pages` → Deployment branches and tags:
-      restrict to `main`.
+- [x] Branch `main` created (from the milestone-1 scaffold commit).
+- [ ] Settings → General → Default branch: **`main`** (scheduled workflows
+      such as the weekly external link check run from the default branch).
+- [ ] Settings → Pages: leave GitHub Pages **disabled**; the site is hosted
+      on Cloudflare (`docs/cloudflare.md`).
+- [ ] Cloudflare's GitHub app is installed for `dfxaorg` with access to
+      `dfxa` only (done when connecting Workers Builds).
 
 ## 3. Branch protection for `main`
 
@@ -40,6 +38,7 @@ Either a classic branch protection rule or a repository ruleset
 - [ ] **Require status checks to pass** and require branches to be up to date:
   - `build` (job of workflow "CI")
   - `link check` (job of workflow "CI")
+  - `accessibility` (job of workflow "CI": axe on all pages, service finder test)
   The checks appear in the selection list only after the CI workflow has run
   at least once on a pull request.
 - [ ] **Block force pushes**
@@ -49,14 +48,18 @@ Either a classic branch protection rule or a repository ruleset
 
 ## 4. Code owners
 
-`.github/CODEOWNERS` assigns each expert's profile bundle
-(`content/experts/<slug>/`) to that expert and all shared pages, templates,
-i18n strings and workflows to all experts. Together with "Require review
-from Code Owners" this means:
+`.github/CODEOWNERS` lists both experts for every path; on an expert's own
+profile bundle (`content/experts/<slug>/`) that expert is listed first.
+Together with "Require review from Code Owners" and one required approval:
 
-- a change to an expert's own profile needs that expert's review (or the
-  other expert's approval when the author is the profile owner);
-- a change to shared pages needs the approval of the other expert(s).
+- a change by the profile owner to their own profile needs the other
+  expert's approval (GitHub does not count the author's own review);
+- a change by anyone else to a profile needs the profile owner's approval;
+- a change to shared pages, templates, i18n strings or workflows needs the
+  approval of the expert who did not author it.
+
+Usernames: Bernhard Haslhofer `@behas`, Johann Stockinger `@uptuk`. Both must
+have write access to the repository, otherwise GitHub ignores their entries.
 
 With more than two experts, "approval of all experts" for shared pages cannot
 be expressed by GitHub's review count alone; in that case raise the required

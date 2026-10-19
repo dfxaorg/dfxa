@@ -1,0 +1,24 @@
+{{- /* /llms-full.txt (DE) and /en/llms-full.txt (EN): full text of all
+       profile and service pages in Markdown. */ -}}
+{{- $other := index .Translations 0 -}}
+# {{ T "site_name" }} – {{ T "site_suffix" }} ({{ T "site_short" }})
+
+> {{ T "site_description" }}
+
+{{ T "disclaimer" }}
+
+{{ T "llms_contact_heading" }}: {{ site.Params.contactEmail }} – {{ T "contact_note" }}
+
+{{ T "llms_other_language" }}: {{ with $other }}{{ (.OutputFormats.Get "llmsfull").Permalink }}{{ end }}
+{{ range partial "sorted-experts.html" (site.GetPage "/experts").Pages }}
+---
+
+{{ partial "md/expert" . }}
+{{ T "md_source" }}: <{{ .Permalink }}>
+{{ end }}
+{{- range (site.GetPage "/services").Pages.ByWeight }}
+---
+
+{{ partial "md/service" . }}
+{{ T "md_source" }}: <{{ .Permalink }}>
+{{ end -}}

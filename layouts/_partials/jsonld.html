@@ -1,0 +1,81 @@
+{{- /* JSON-LD structured data, generated from front matter (never written
+       per page). The network is described only as a WebSite – never as
+       Organization, ProfessionalService or LocalBusiness. Experts are
+       Person entities and the providers of services. */ -}}
+{{- if ne .Kind "404" }}
+{{- $lang := .Language.Lang }}
+{{- $website := dict
+  "@type" "WebSite"
+  "@id" (printf "%s#website" site.Home.Permalink)
+  "name" "DFXA – Digital Forensics Austria"
+  "alternateName" (T "site_alternate_name")
+  "url" site.Home.Permalink
+  "inLanguage" $lang
+  "description" (T "site_description") }}
+{{- $graph := slice $website }}
+
+{{- /* The page itself */}}
+{{- $pageType := "WebPage" }}
+{{- if and (eq .Section "experts") .IsPage }}{{ $pageType = "ProfilePage" }}{{ end }}
+{{- if or (eq .Kind "taxonomy") (eq .Kind "section") }}{{ $pageType = "CollectionPage" }}{{ end }}
+{{- $webpage := dict
+  "@type" $pageType
+  "@id" .Permalink
+  "url" .Permalink
+  "name" .Title
+  "inLanguage" $lang
+  "isPartOf" (dict "@id" (printf "%s#website" site.Home.Permalink)) }}
+{{- with .Description }}{{ $webpage = merge $webpage (dict "description" .) }}{{ end }}
+{{- with .Lastmod }}{{ if not .IsZero }}{{ $webpage = merge $webpage (dict "dateModified" (.Format "2006-01-02T15:04:05Z07:00")) }}{{ end }}{{ end }}
+
+{{- /* Expert profile: ProfilePage with mainEntity Person */}}
+{{- if eq $pageType "ProfilePage" }}
+{{- $person := partial "jsonld/person.html" (dict "page" . "full" true) }}
+{{- $webpage = merge $webpage (dict "mainEntity" (dict "@id" (index $person "@id"))) }}
+{{- $graph = $graph | append $person }}
+{{- end }}
+
+{{- /* Service page: Service with the offering experts as providers */}}
+{{- if and (eq .Kind "term") (eq .Data.Plural "services") }}
+{{- $providers := slice }}
+{{- $langs := slice }}
+{{- range partial "sorted-experts.html" .Pages }}
+{{- $providers = $providers | append (partial "jsonld/person.html" (dict "page" . "full" false)) }}
+{{- range .Params.languages }}{{ $langs = $langs | append . }}{{ end }}
+{{- end }}
+{{- $service := dict
+  "@type" "Service"
+  "@id" (printf "%s#service" .Permalink)
+  "name" .Title
+  "serviceType" .Title
+  "url" .Permalink
+  "areaServed" (dict "@type" "Country" "name" (T "area_served"))
+  "availableLanguage" ($langs | uniq)
+  "provider" $providers }}
+{{- with .Description }}{{ $service = merge $service (dict "description" .) }}{{ end }}
+{{- with .Params.domain }}{{ $service = merge $service (dict "category" (partial "term-title.html" (dict "taxonomy" "domains" "key" .))) }}{{ end }}
+{{- $webpage = merge $webpage (dict "mainEntity" (dict "@id" (index $service "@id"))) }}
+{{- $graph = $graph | append $service }}
+{{- end }}
+
+{{- /* Breadcrumbs: Home › parent › page (all pages except home) */}}
+{{- if not .IsHome }}
+{{- $items := slice (dict "@type" "ListItem" "position" 1 "name" (T "breadcrumb_home") "item" site.Home.Permalink) }}
+{{- with .Parent }}{{ if not .IsHome }}
+{{- $items = $items | append (dict "@type" "ListItem" "position" 2 "name" .LinkTitle "item" .Permalink) }}
+{{- end }}{{ end }}
+{{- $items = $items | append (dict "@type" "ListItem" "position" (add (len $items) 1) "name" .LinkTitle "item" .Permalink) }}
+{{- $graph = $graph | append (dict "@type" "BreadcrumbList" "@id" (printf "%s#breadcrumb" .Permalink) "itemListElement" $items) }}
+{{- $webpage = merge $webpage (dict "breadcrumb" (dict "@id" (printf "%s#breadcrumb" .Permalink))) }}
+{{- end }}
+
+{{- /* FAQ: only where the content is question and answer */}}
+{{- with .Params.faq }}
+{{- $qs := slice }}
+{{- range . }}{{ $qs = $qs | append (dict "@type" "Question" "name" .question "acceptedAnswer" (dict "@type" "Answer" "text" .answer)) }}{{ end }}
+{{- $graph = $graph | append (dict "@type" "FAQPage" "@id" (printf "%s#faq" $.Permalink) "url" $.Permalink "inLanguage" $lang "mainEntity" $qs) }}
+{{- end }}
+
+{{- $graph = $graph | append $webpage }}
+<script type="application/ld+json">{{ dict "@context" "https://schema.org" "@graph" $graph | jsonify | safeJS }}</script>
+{{- end }}

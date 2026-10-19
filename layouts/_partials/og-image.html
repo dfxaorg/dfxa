@@ -1,0 +1,16 @@
+{{- /* Open Graph image for a page: the page title on a neutral background,
+       rendered at build time with Hugo image processing (built-in Go font,
+       no external services). Called via partialCached per page.
+       Returns an image resource. */ -}}
+{{- $base := resources.Get "images/og-base.png" }}
+{{- $title := .Title }}
+{{- if .IsHome }}{{ $title = T "site_name" }}{{ end }}
+{{- if eq .Kind "404" }}{{ $title = T "notfound_title" }}{{ end }}
+{{- $filters := slice
+  (images.Text $title (dict "color" "#1a1d21" "size" 64 "linespacing" 14 "x" 80 "y" 150))
+  (images.Text (printf "%s – %s" (T "site_name") (T "site_suffix")) (dict "color" "#4b5360" "size" 30 "x" 80 "y" 545))
+  (images.Text (T "site_short") (dict "color" "#1d4a80" "size" 34 "x" 80 "y" 70))
+}}
+{{- $slug := strings.Trim (.RelPermalink | lower | replaceRE `[^a-z0-9]+` "-") "-" | default "home" }}
+{{- if eq .Kind "404" }}{{ $slug = "404" }}{{ end }}
+{{- return ($base | images.Filter $filters | resources.Copy (printf "og/%s-%s.png" .Language.Lang $slug)) -}}

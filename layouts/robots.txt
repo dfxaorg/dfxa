@@ -1,0 +1,62 @@
+# robots.txt for dfxa.at
+#
+# All search engines and AI assistants may crawl the site: being found and
+# cited correctly is a goal of the site. The AI crawlers are listed one per
+# block so that individual crawlers can be switched off. Crawlers marked
+# "training" collect data to train AI models; to opt out of training while
+# remaining findable in AI search and answers, change their "Allow: /" to
+# "Disallow: /". Crawlers marked "search" or "user" retrieve pages to answer
+# questions and should stay allowed.
+#
+# Policy: all crawlers allowed, including AI training crawlers
+# (decided 2026-10-14; see docs/seo.md).
+
+# All other crawlers, including search engines (Googlebot, Bingbot, …)
+User-agent: *
+Allow: /
+
+# OpenAI – training
+User-agent: GPTBot
+Allow: /
+
+# OpenAI – search (ChatGPT search results)
+User-agent: OAI-SearchBot
+Allow: /
+
+# OpenAI – user (fetches pages on request of a ChatGPT user)
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic – training
+User-agent: ClaudeBot
+Allow: /
+
+# Anthropic – user (fetches pages on request of a Claude user)
+User-agent: Claude-User
+Allow: /
+
+# Anthropic – search (Claude search results)
+User-agent: Claude-SearchBot
+Allow: /
+
+# Perplexity – search
+User-agent: PerplexityBot
+Allow: /
+
+# Perplexity – user (fetches pages on request of a Perplexity user)
+User-agent: Perplexity-User
+Allow: /
+
+# Google – training of Gemini models (does not affect Google Search or AI Overviews)
+User-agent: Google-Extended
+Allow: /
+
+# Apple – training of Apple's AI models (does not affect Apple search)
+User-agent: Applebot-Extended
+Allow: /
+
+# Common Crawl – open web archive, widely used as AI training data
+User-agent: CCBot
+Allow: /
+
+Sitemap: {{ "sitemap.xml" | absURL }}

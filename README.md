@@ -17,7 +17,9 @@ party (see "Content rules" below).
 - No external fonts, CDNs, scripts, cookies or analytics. CSS and JS are
   bundled with Hugo Pipes.
 - Bilingual: German (default, `/`) and English (`/en/`).
-- Hosted on GitHub Pages, deployed by GitHub Actions on every push to `main`.
+- Hosted on Cloudflare (Workers static assets), deployed by Cloudflare
+  Workers Builds on every push to `main`; mail to contact@dfxa.at via
+  Cloudflare Email Routing (`docs/cloudflare.md`).
 
 ## Repository layout
 
@@ -28,9 +30,10 @@ party (see "Content rules" below).
 | `i18n/de.toml`, `i18n/en.toml` | All UI strings (never hard-code text in templates) |
 | `layouts/` | Templates (`baseof.html`, `home.html`, …) and partials in `layouts/_partials/` |
 | `assets/` | CSS and JS processed by Hugo Pipes |
-| `static/CNAME` | Custom domain for GitHub Pages (`dfxa.at`) |
+| `wrangler.jsonc` | Cloudflare Worker configuration (static assets, custom domain `dfxa.at`) |
+| `static/_headers`, `static/_redirects` | Security headers (CSP, HSTS, …) and redirects on Cloudflare |
 | `scripts/check-language-parity.mjs` | CI check: every content file and i18n key in both languages |
-| `docs/` | Operational documentation (repository settings, DNS, SEO, admission of experts) |
+| `docs/` | Operational documentation (repository settings, DNS, SEO, data file, admission of experts) |
 
 ## Local development
 
@@ -40,7 +43,12 @@ Install Hugo extended 0.166.0 (see the
 ```sh
 hugo server                     # http://localhost:1313/ (DE) and /en/ (EN)
 hugo --gc                       # production build into public/
-node scripts/check-language-parity.mjs
+npm run check:parity            # every content file and i18n key in DE and EN
+npm run check:seo               # titles, descriptions, hreflang, JSON-LD, llms.txt (after hugo)
+npm ci && npx playwright install chromium   # once, for the browser checks
+npm run check:a11y              # axe (WCAG 2.1 AA) and CSP on all pages in public/
+npm run build:cloudflare        # the Cloudflare build (production: WORKERS_CI_BRANCH=main)
+npm run test:finder             # service finder with and without JavaScript
 ```
 
 `enableGitInfo` is on, so the repository needs at least one commit for the
@@ -52,15 +60,20 @@ without history.
 ### Edit or add an expert
 
 Each expert is a page bundle in `content/experts/<slug>/` with
-`index.de.md`, `index.en.md` and a portrait image. The front matter schema
+`index.de.md`, `index.en.md` and a portrait image (`portrait.jpg`). Create a
+new one with `hugo new content experts/<slug>`. The front matter schema
 (court certification, services, audiences, domains, optional contact data) is
 documented in `docs/adding-an-expert.md`. Each expert edits only their own
 bundle; `CODEOWNERS` assigns it to them.
 
 ### Add a service
 
-1. Create `content/services/<slug>/_index.de.md` and `_index.en.md` with
-   `title`, `description` and `domains`.
+1. Create `content/services/<key>/_index.de.md` and `_index.en.md` with
+   `title`, `description` (≤ 155 characters), `weight`, `domain` (one key of
+   `content/domains/`), `typical_audiences`, `keywords` (search synonyms
+   for the service finder) and `result`, and a body that
+   starts with a plain-language definition followed by typical questions.
+   The German file also sets `slug` (German URL slug).
 2. Add `<slug>` to the `services` list in the front matter of every expert
    who offers it. The service finder is generated from the expert profiles;
    it is not maintained by hand.
@@ -74,7 +87,8 @@ bundle; `CODEOWNERS` assigns it to them.
 - No references to cases or clients, testimonials, client logos, statistics
   or case counts unless the expert provides them explicitly.
 - Every page needs a `description` (≤ 155 characters) in both languages.
-- Items that need confirmation are marked `TODO: verify` in the content files.
+- Items that need confirmation are marked `TODO: verify` in the content files;
+  `scripts/list-todos.sh` lists them.
 
 ## Review rule for shared pages
 
@@ -85,8 +99,14 @@ This is enforced by branch protection on `main` and by `CODEOWNERS`; see
 
 ## Deployment
 
-Every push to `main` runs the checks in `.github/workflows/ci.yml` (language
-parity, build, internal link check) and then deploys with the official
-GitHub Pages actions (`.github/workflows/deploy.yml`). Pull requests run the
-same checks without deploying. External links are checked weekly by
-`.github/workflows/linkcheck-external.yml`.
+Pull requests and pushes to `main` run the checks in
+`.github/workflows/ci.yml` (language parity, build, SEO check, internal link
+check, accessibility, Content-Security-Policy and service finder tests);
+branch protection requires them before merging. Cloudflare Workers Builds
+then builds `main` with `sh scripts/build-cloudflare.sh` and deploys it to
+`dfxa.at`; the build stops if the language or SEO checks fail, and the deploy
+if the TODO check fails, so a page with a `TODO` marker is never published
+(open items: `docs/open-items.md`). Other branches get a non-indexed preview
+on `https://dev-dfxa.dfxa.workers.dev`. External links are checked weekly
+by `.github/workflows/linkcheck-external.yml`.
+Setup: `docs/cloudflare.md`, `docs/dns.md`, `docs/repository-setup.md`.

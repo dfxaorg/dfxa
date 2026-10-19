@@ -1,14 +1,16 @@
 <footer class="site-footer">
-  <div class="container">
-    <p class="site-footer__name"><strong>{{ T "site_name" }}</strong> – {{ T "site_suffix" }} ({{ T "site_short" }})</p>
-    <p class="disclaimer">{{ T "disclaimer" }}</p>
-    {{- partial "contact.html" (dict "heading" true) }}
-    <nav aria-label="{{ T "nav_footer_label" }}">
-      <ul class="site-footer__links">
-        {{- range site.Menus.footer }}
-        <li><a href="{{ .URL }}">{{ T .Identifier }}</a></li>
-        {{- end }}
-      </ul>
-    </nav>
+  <div class="container site-footer__grid">
+    <div>
+      <p class="site-footer__name">{{ T "site_name" }} – {{ T "site_suffix" }} ({{ T "site_short" }})</p>
+      <p class="disclaimer">{{ T "disclaimer" }}</p>
+      <nav aria-label="{{ T "nav_footer_label" }}">
+        <ul class="site-footer__links">
+          {{- range site.Menus.footer }}
+          <li><a href="{{ .URL }}">{{ T .Identifier }}</a></li>
+          {{- end }}
+        </ul>
+      </nav>
+    </div>
+    {{- partial "contact.html" (dict "heading" true "id" "contact") }}
   </div>
 </footer>

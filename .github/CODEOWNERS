@@ -1,0 +1,12 @@
+# Code owners. The last matching pattern takes precedence.
+#
+# Shared pages, templates, i18n strings (including the disclaimer),
+# configuration and workflows belong to all experts.
+*                                       @behas @uptuk
+
+# Expert profiles. The profile owner is listed first. The other expert is
+# listed as well because GitHub does not count the author's own review: a
+# change made by the profile owner then needs the other expert's approval,
+# and a change made by anyone else needs the profile owner's approval.
+/content/experts/bernhard-haslhofer/    @behas @uptuk
+/content/experts/johann-stockinger/     @uptuk @behas

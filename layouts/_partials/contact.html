@@ -1,7 +1,7 @@
 {{- /* Contact block: mailto link to the network address plus the mandatory
        forwarding note. Params: subject (optional), text (optional link text),
-       heading (bool). */ -}}
-<div class="contact">
+       heading (bool), id (optional anchor id). */ -}}
+<div class="contact"{{ with .id }} id="{{ . }}"{{ end }}>
   {{- if .heading }}<h2 class="contact__heading">{{ T "contact_heading" }}</h2>{{ end }}
   <p class="contact__link">{{ partial "mailto.html" (dict "subject" .subject "text" .text) }}</p>
   <p class="contact__note">{{ partial "obfuscate-address.html" (T "contact_note") }}</p>

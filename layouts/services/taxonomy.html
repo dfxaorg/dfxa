@@ -1,0 +1,71 @@
+{{ define "main" }}
+{{- /* Service finder. The complete list, grouped by domain, is rendered
+       server-side. assets/js/finder.js only shows or hides these elements,
+       based on /services.json; without JavaScript the filter form stays
+       hidden and the full list is shown. */ -}}
+{{- $index := site.Home.OutputFormats.Get "services" }}
+<div class="container finder">
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+  <p>{{ T "services_finder_intro" }}</p>
+
+  <form class="finder__form" role="search" aria-label="{{ T "finder_filter_label" }}"
+        data-index="{{ $index.RelPermalink }}"
+        data-count-one="{{ T "finder_count_one" }}"
+        data-count-other="{{ T "finder_count_other" (dict "Count" "{n}") }}">
+    <div class="finder__search">
+      <label for="finder-q">{{ T "finder_search_label" }}</label>
+      <input id="finder-q" name="q" type="search" autocomplete="off" placeholder="{{ T "finder_search_placeholder" }}">
+    </div>
+    <fieldset class="finder__group">
+      <legend>{{ T "finder_audience_legend" }}</legend>
+      <ul class="chip-list">
+        {{- range (site.GetPage "/audiences").Pages.ByWeight }}
+        <li><label class="chip"><input type="checkbox" name="audience" value="{{ .Data.Term }}"> {{ .LinkTitle }}</label></li>
+        {{- end }}
+      </ul>
+    </fieldset>
+    <fieldset class="finder__group">
+      <legend>{{ T "finder_domain_legend" }}</legend>
+      <ul class="chip-list">
+        {{- range (site.GetPage "/domains").Pages.ByWeight }}
+        <li><label class="chip"><input type="checkbox" name="domain" value="{{ .Data.Term }}"> {{ .LinkTitle }}</label></li>
+        {{- end }}
+      </ul>
+    </fieldset>
+    <p class="finder__status">
+      <span class="finder__count" role="status" aria-live="polite"></span>
+      <button type="reset" class="button button--small">{{ T "finder_reset" }}</button>
+    </p>
+  </form>
+  <p class="finder__none notice" hidden>{{ T "finder_none" }}</p>
+
+  {{- $services := .Pages }}
+  {{- range (site.GetPage "/domains").Pages.ByWeight }}
+  {{- $domain := . }}
+  {{- with where $services "Params.domain" .Data.Term }}
+  <section class="service-group" data-domain="{{ $domain.Data.Term }}" aria-labelledby="d-{{ $domain.Data.Term }}">
+    <h2 id="d-{{ $domain.Data.Term }}">{{ $domain.LinkTitle }}</h2>
+    <div class="card-grid">
+      {{- range .ByWeight }}
+      <article class="card service-card" data-service="{{ .Data.Term }}">
+        <h3 class="card__title"><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h3>
+        <p>{{ .Description }}</p>
+        {{- with .Params.typical_audiences }}
+        <p class="card__meta">{{ T "finder_for" }}:
+          {{- range $i, $a := . }}{{ if $i }},{{ end }} {{ partial "term-title.html" (dict "taxonomy" "audiences" "key" $a) }}{{ end }}</p>
+        {{- end }}
+        {{- with partial "sorted-experts.html" .Pages }}
+        <p class="card__meta">{{ T "services_offered_by" }}:
+          {{- range $i, $e := . }}{{ if $i }},{{ end }} <a href="{{ $e.RelPermalink }}">{{ partial "expert-name.html" $e }}</a>{{ end }}</p>
+        {{- end }}
+      </article>
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+  {{- end }}
+</div>
+{{- $js := resources.Get "js/finder.js" | js.Build (dict "minify" true "target" "es2018") | fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
+{{ end }}

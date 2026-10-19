@@ -5,7 +5,6 @@ site_name = "Digital Forensics Austria"
 site_short = "DFXA"
 site_suffix = "Network of Independent Experts"
 site_title_suffix = "DFXA Digital Forensics Austria"
-home_link_label = "Home: Digital Forensics Austria – Network of Independent Experts"
 
 skip_to_content = "Skip to content"
 nav_main_label = "Main navigation"
@@ -29,9 +28,109 @@ last_updated = "Last updated"
 notfound_title = "Page not found"
 notfound_text = "The requested page does not exist or has been moved."
 notfound_home = "Go to the home page"
-# The 404 page is served for both languages by GitHub Pages (/404.html),
-# so it also carries the text of the other language.
+# The 404 page also carries the text of the other language, so that a
+# visitor who mistyped a URL finds both home pages.
 notfound_alt_lang = "de"
 notfound_alt_title = "Seite nicht gefunden"
 notfound_alt_text = "Die angeforderte Seite existiert nicht oder wurde verschoben."
 notfound_alt_home = "Zur deutschen Startseite"
+
+# --- Breadcrumbs, dates -------------------------------------------------------
+breadcrumb_label = "Breadcrumb"
+breadcrumb_home = "Home"
+
+# --- Expert profile -----------------------------------------------------------
+# Placeholders: .Name, .Role, .Fields, .ListNumber, .City, .Languages
+profile_intro_cert = "{{ .Name }} is a {{ .Role }} for {{ .Fields }}, registered in the Austrian list of court experts under number {{ .ListNumber }}."
+profile_intro_location = "{{ .Name }} is based in {{ .City }} and works in {{ .Languages }}."
+profile_services = "Services"
+profile_court_certification = "Court certification"
+profile_cert_fields = "Fields according to the list of court experts"
+profile_cert_list_number = "List number"
+profile_cert_link = "Entry in the Austrian list of court experts (JustizOnline)"
+profile_other_certifications = "Other certifications"
+profile_contact = "Contact"
+profile_own_email = "Own email address"
+profile_phone = "Phone"
+profile_website = "Website"
+profile_portrait_alt = "Portrait of {{ .Name }}"
+list_and = "and"
+lang_de = "German"
+lang_en = "English"
+
+# --- Contact ------------------------------------------------------------------
+# Subject lines of prefilled mailto links. Placeholders: .Name, .Service
+contact_subject_expert = "Enquiry to {{ .Name }}"
+contact_subject_expert_service = "Enquiry to {{ .Name }}: {{ .Service }}"
+contact_subject_service = "Enquiry: {{ .Service }}"
+contact_expert = "Contact {{ .Name }}"
+contact_jump = "Contact address and note on forwarding"
+
+# --- Experts list, cards ------------------------------------------------------
+experts_profile_link = "Profile of {{ .Name }}"
+card_court_fields = "Court-certified for"
+card_services = "Services"
+
+# --- Services -----------------------------------------------------------------
+service_audiences = "Who typically commissions this service?"
+service_result = "Result"
+service_experts = "Experts offering this service"
+service_experts_intro = "The following experts in the network offer this service. They are listed alphabetically by surname."
+service_domain = "Domain"
+services_offered_by = "Offered by"
+services_finder_intro = "Services by domain. Each service leads to the experts who offer it."
+
+# --- Taxonomy terms (domains, audiences) --------------------------------------
+term_experts = "Experts"
+term_services = "Services"
+
+# --- Home ---------------------------------------------------------------------
+home_finder_heading = "Find the relevant expert"
+home_finder_text = "Choose a service to see the experts who offer it."
+home_finder_link = "Go to the services"
+home_experts_heading = "The experts in the network"
+home_disclaimer_heading = "Note"
+
+# --- Court certification fields -------------------------------------------------
+# Placeholders: .Name, .Number, .Restriction, .Date
+court_field_inline = "“{{ .Name }}” ({{ .Number }})"
+court_field_inline_restricted = "“{{ .Name }}” ({{ .Number }}, restricted to {{ .Restriction }})"
+court_field_restriction = "restricted to {{ .Restriction }}"
+court_field_certified_until = "certified until {{ .Date }}"
+profile_cert_group = "Group"
+
+# --- Service finder filters ------------------------------------------------------
+finder_filter_label = "Filter services"
+finder_search_label = "Search services"
+finder_search_placeholder = "e.g. cryptocurrency, expert opinion, ransomware"
+finder_audience_legend = "For whom?"
+finder_domain_legend = "Domain"
+finder_reset = "Reset filters"
+finder_count_one = "1 service found."
+finder_count_other = "{{ .Count }} services found."
+finder_none = "No service matches the selected filters."
+finder_for = "For"
+home_search_label = "Search for a service"
+home_search_submit = "Search"
+
+# --- SEO, structured data, machine-readable formats -------------------------------
+service_faq = "Frequently asked questions"
+og_image_alt = "{{ .Title }} – Digital Forensics Austria, Network of Independent Experts"
+site_alternate_name = "Network of Independent Experts"
+site_description = "Network of independent, court-certified expert witnesses for IT forensics, IT security and cryptoasset forensics in Austria."
+area_served = "Austria"
+credential_category = "Court certification as expert witness"
+credential_recognized_by = "Republik Österreich – Bundesministerium für Justiz"
+llms_other_language = "Deutsche Version"
+llms_disclaimer_heading = "Note"
+llms_contact_heading = "Contact"
+llms_experts_heading = "Experts"
+llms_services_heading = "Services"
+llms_data_heading = "Machine-readable data"
+llms_data_json = "Services, domains, audiences and experts as JSON"
+llms_data_full = "Full text of all profile and service pages"
+llms_data_markdown = "Every profile and service page is also available as Markdown at <URL>index.md."
+llms_offered_by = "offered by"
+md_source = "Source"
+md_contact_subject = "Subject"
+md_email = "Email"

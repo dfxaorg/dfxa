@@ -1,0 +1,15 @@
+{{- /* Key-fact sentences of an expert profile (name, court certification,
+       fields, list number, location, languages), generated from front matter.
+       Used in the HTML profile, its Markdown alternate and llms.txt.
+       Returns a slice of strings. */ -}}
+{{- $name := partial "expert-name.html" . }}
+{{- $out := slice }}
+{{- with .Params.court_certification }}
+{{- $fields := partial "court-fields.html" $ }}
+{{- $out = $out | append (T "profile_intro_cert" (dict "Name" $name "Role" $.Params.role "Fields" (partial "join-list.html" $fields) "ListNumber" .list_number)) }}
+{{- end }}
+{{- with .Params.address }}{{ with .locality }}
+{{- $langs := slice }}{{ range $.Params.languages }}{{ $langs = $langs | append (T (printf "lang_%s" .)) }}{{ end }}
+{{- $out = $out | append (T "profile_intro_location" (dict "Name" $name "City" . "Languages" (partial "join-list.html" $langs))) }}
+{{- end }}{{ end }}
+{{- return $out -}}

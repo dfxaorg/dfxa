@@ -1,0 +1,91 @@
+{{ define "main" }}
+{{- $name := partial "expert-name.html" . }}
+{{- $cc := .Params.court_certification }}
+<article class="container profile">
+  {{ partial "breadcrumbs.html" . }}
+  <header class="profile__header">
+    {{- partial "portrait.html" (dict "page" . "width" 136 "eager" true) }}
+    <div>
+      <h1>{{ .Title }}</h1>
+      {{- with .Params.role }}<p class="profile__role">{{ strings.FirstUpper . }}</p>{{ end }}
+    </div>
+  </header>
+
+  <div class="profile__intro">
+    <p>{{ delimit (partial "profile-intro.html" .) " " }}</p>
+  </div>
+
+  {{ .Content }}
+
+  {{- with .GetTerms "services" }}
+  <section aria-labelledby="h-services">
+    <h2 id="h-services">{{ T "profile_services" }}</h2>
+    <ul class="link-list">
+      {{- range sort . "LinkTitle" }}
+      <li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{- with $cc }}
+  <section aria-labelledby="h-cert">
+    <h2 id="h-cert">{{ T "profile_court_certification" }}</h2>
+    <p>{{ strings.FirstUpper $.Params.role }}</p>
+    <dl class="facts">
+      <dt>{{ T "profile_cert_fields" }}</dt>
+      <dd>
+        {{- with .group }}<p class="facts__group">{{ T "profile_cert_group" }} {{ . }}{{ with $cc.official_group }} (<span lang="de">{{ . }}</span>){{ end }}</p>{{ end }}
+        <ul>
+        {{- range .fields }}
+        <li>{{ with .number }}{{ . }} {{ end }}{{ .name }}{{ with .official_name }} (<span lang="de">{{ . }}</span>){{ end }}
+          {{- with .restriction }}, {{ T "court_field_restriction" (dict "Restriction" .) }}{{ end }}
+          {{- with .official_restriction }} (<span lang="de">{{ . }}</span>){{ end }}
+          {{- with .certified_until }} – {{ T "court_field_certified_until" (dict "Date" (time.Format ":date_long" .)) }}{{ end }}</li>
+        {{- end }}
+        </ul>
+      </dd>
+      <dt>{{ T "profile_cert_list_number" }}</dt>
+      <dd>{{ .list_number }}</dd>
+    </dl>
+    {{- with .url }}
+    <p><a href="{{ . }}" rel="noopener">{{ T "profile_cert_link" }}</a></p>
+    {{- end }}
+  </section>
+  {{- end }}
+
+  {{- with .Params.other_certifications }}
+  <section aria-labelledby="h-other-cert">
+    <h2 id="h-other-cert">{{ T "profile_other_certifications" }}</h2>
+    <ul>
+      {{- range . }}
+      <li>{{ with .url }}<a href="{{ . }}" rel="noopener">{{ end }}{{ .name }}{{ with .url }}</a>{{ end }}{{ with .issuer }} – {{ . }}{{ end }}</li>
+      {{- end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  <section aria-labelledby="h-contact">
+    <h2 id="h-contact">{{ T "profile_contact" }}</h2>
+    {{- partial "contact.html" (dict "subject" (T "contact_subject_expert" (dict "Name" $name)) "text" (T "contact_expert" (dict "Name" $name))) }}
+    {{- if or .Params.email .Params.phone .Params.website }}
+    <dl class="facts">
+      {{- with .Params.email }}
+      <dt>{{ T "profile_own_email" }}</dt>
+      <dd>{{ partial "mailto.html" (dict "email" .) }}</dd>
+      {{- end }}
+      {{- with .Params.phone }}
+      <dt>{{ T "profile_phone" }}</dt>
+      <dd><a href="tel:{{ replaceRE `[^+0-9]` "" . }}">{{ . }}</a></dd>
+      {{- end }}
+      {{- with .Params.website }}
+      <dt>{{ T "profile_website" }}</dt>
+      <dd><a href="{{ . }}" rel="noopener">{{ replaceRE `^https?://|/$` "" . }}</a></dd>
+      {{- end }}
+    </dl>
+    {{- end }}
+  </section>
+
+  {{ partial "last-updated.html" . }}
+</article>
+{{ end }}

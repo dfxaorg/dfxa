@@ -1,0 +1,5 @@
+{{- /* Title of a taxonomy term in the current language.
+       Params: taxonomy (string), key (term key). Falls back to the key. */ -}}
+{{- $title := .key }}
+{{- with site.GetPage (printf "/%s/%s" .taxonomy .key) }}{{ $title = .LinkTitle }}{{ end }}
+{{- return $title -}}

@@ -1,0 +1,50 @@
+{{- /* Public, documented data file listing services, domains, audiences and
+       the experts offering each service (docs/services-json.md). Generated
+       from the expert profiles and the taxonomy term pages. */ -}}
+{{- $lang := site.Language.Lang }}
+{{- $domains := slice }}
+{{- range (site.GetPage "/domains").Pages.ByWeight }}
+{{- $domains = $domains | append (dict "id" .Data.Term "title" .LinkTitle "url" .Permalink "description" .Description) }}
+{{- end }}
+{{- $audiences := slice }}
+{{- range (site.GetPage "/audiences").Pages.ByWeight }}
+{{- $audiences = $audiences | append (dict "id" .Data.Term "title" .LinkTitle "url" .Permalink) }}
+{{- end }}
+{{- $services := slice }}
+{{- range (site.GetPage "/services").Pages.ByWeight }}
+{{- $experts := slice }}
+{{- range partial "sorted-experts.html" .Pages }}{{ $experts = $experts | append .File.ContentBaseName }}{{ end }}
+{{- $services = $services | append (dict
+  "id" .Data.Term
+  "title" .LinkTitle
+  "description" .Description
+  "keywords" (.Params.keywords | default slice)
+  "url" .Permalink
+  "domain" .Params.domain
+  "audiences" (.Params.typical_audiences | default slice)
+  "experts" $experts) }}
+{{- end }}
+{{- $experts := slice }}
+{{- range partial "sorted-experts.html" (site.GetPage "/experts").Pages }}
+{{- $experts = $experts | append (dict
+  "id" .File.ContentBaseName
+  "name" .Title
+  "given_name" .Params.given_name
+  "family_name" .Params.family_name
+  "url" .Permalink
+  "court_certification_url" (.Params.court_certification.url | default "")
+  "services" (.Params.services | default slice)
+  "contact" site.Params.contactEmail) }}
+{{- end }}
+{{- $data := dict
+  "name" (printf "%s – %s" (T "site_name") (T "site_suffix"))
+  "language" $lang
+  "url" site.Home.Permalink
+  "contact" site.Params.contactEmail
+  "contact_note" (T "contact_note")
+  "disclaimer" (T "disclaimer")
+  "domains" $domains
+  "audiences" $audiences
+  "services" $services
+  "experts" $experts }}
+{{- $data | jsonify (dict "indent" "  ") }}

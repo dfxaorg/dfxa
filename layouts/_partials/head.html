@@ -1,23 +1,61 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{{- $suffix := T "site_title_suffix" }}
+{{- /* Title: front matter seo_title, else "<Page> – DFXA Digital Forensics
+       Austria"; if that exceeds 60 characters, "<Page> – DFXA". */}}
 {{- $title := "" }}
+{{- $pageTitle := .Title }}
+{{- if eq .Kind "404" }}{{ $pageTitle = T "notfound_title" }}{{ end }}
+{{- /* Domain and audience pages: "Fachgebiete: IT-Forensik", so that they do
+       not share a title with a service of the same name. */}}
+{{- if and (eq .Kind "term") (in (slice "domains" "audiences") .Data.Plural) }}{{ $pageTitle = printf "%s: %s" .Parent.Title .Title }}{{ end }}
 {{- if .Params.seo_title }}{{ $title = .Params.seo_title }}
-{{- else if eq .Kind "404" }}{{ $title = printf "%s – %s" (T "notfound_title") $suffix }}
 {{- else if .IsHome }}{{ $title = printf "%s – %s" (T "site_name") (T "site_suffix") }}
-{{- else }}{{ $title = printf "%s – %s" .Title $suffix }}{{ end }}
-<title>{{ $title }}</title>
-{{- $desc := .Description | default .Summary | plainify | htmlUnescape | strings.TrimSpace }}
-{{- if not .Description }}{{ if not (eq .Kind "404") }}{{ warnf "[seo] missing description: %s (%s)" .RelPermalink .Language.Lang }}{{ end }}{{ end }}
-{{- with $desc }}
-<meta name="description" content="{{ . | truncate 155 }}">
+{{- else }}
+  {{- $title = printf "%s – %s" $pageTitle (T "site_title_suffix") }}
+  {{- if gt (strings.RuneCount $title) 60 }}{{ $title = printf "%s – %s" $pageTitle (T "site_short") }}{{ end }}
 {{- end }}
+{{- if gt (strings.RuneCount $title) 60 }}{{ warnf "[seo] title longer than 60 characters (%d): %s" (strings.RuneCount $title) .RelPermalink }}{{ end }}
+<title>{{ $title }}</title>
+{{- $desc := .Description }}
+{{- if eq .Kind "404" }}{{ $desc = T "notfound_text" }}{{ end }}
+{{- if not $desc }}{{ warnf "[seo] missing description: %s (%s)" .RelPermalink .Language.Lang }}{{ $desc = T "site_description" }}{{ end }}
+{{- if gt (strings.RuneCount $desc) 155 }}{{ warnf "[seo] description longer than 155 characters (%d): %s" (strings.RuneCount $desc) .RelPermalink }}{{ end }}
+<meta name="description" content="{{ $desc }}">
 {{- if eq .Kind "404" }}
 <meta name="robots" content="noindex">
 {{- else }}
 <link rel="canonical" href="{{ .Permalink }}">
 {{- partial "hreflang.html" . }}
+{{- with .OutputFormats.Get "markdown" }}
+<link rel="alternate" type="text/markdown" href="{{ .Permalink }}" title="Markdown">
 {{- end }}
+{{- end }}
+{{- /* Open Graph and Twitter Card; self-hosted image generated per page. */}}
+{{- $og := partialCached "og-image.html" . .RelPermalink .Language.Lang .Kind }}
+<meta property="og:type" content="{{ if eq .Section "experts" }}{{ if .IsPage }}profile{{ else }}website{{ end }}{{ else }}website{{ end }}">
+<meta property="og:site_name" content="{{ T "site_name" }} – {{ T "site_suffix" }}">
+<meta property="og:title" content="{{ $pageTitle }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:locale" content="{{ cond (eq .Language.Lang "de") "de_AT" "en_GB" }}">
+{{- range .Translations }}
+<meta property="og:locale:alternate" content="{{ cond (eq .Language.Lang "de") "de_AT" "en_GB" }}">
+{{- end }}
+<meta property="og:image" content="{{ $og.Permalink }}">
+<meta property="og:image:width" content="{{ $og.Width }}">
+<meta property="og:image:height" content="{{ $og.Height }}">
+<meta property="og:image:alt" content="{{ T "og_image_alt" (dict "Title" $pageTitle) }}">
+<meta name="twitter:card" content="summary_large_image">
+{{- with .Lastmod }}{{ if and (not .IsZero) (in (slice "page" "term") $.Kind) }}
+<meta property="article:modified_time" content="{{ .Format "2006-01-02T15:04:05Z07:00" }}">
+{{- end }}{{ end }}
 <meta name="color-scheme" content="light dark">
-{{- $css := resources.Get "css/main.css" | minify | fingerprint }}
-<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">
+{{- /* Marks JavaScript support before first paint (see .finder__form in CSS). */}}
+<script>document.documentElement.classList.add("js")</script>
+{{- /* The stylesheet is small; inlining it avoids a render-blocking request. */}}
+{{- $css := resources.Get "css/main.css" | minify }}
+<style>{{ $css.Content | safeCSS }}</style>
+{{- partial "jsonld.html" . }}

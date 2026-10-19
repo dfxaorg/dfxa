@@ -1,6 +1,38 @@
 {{ define "main" }}
 <div class="container">
-  <h1>{{ .Title }}</h1>
-  {{ .Content }}
+  <h1>{{ .Title }}<span class="h1-suffix"> – {{ T "site_suffix" }}</span></h1>
+  <div class="lead">{{ .Content }}</div>
+
+  {{- with site.GetPage "/services" }}
+  <section class="finder-entry" aria-labelledby="h-finder">
+    <h2 id="h-finder">{{ T "home_finder_heading" }}</h2>
+    <p>{{ T "home_finder_text" }}</p>
+    <form class="home-search" role="search" action="{{ .RelPermalink }}" method="get">
+      <label for="home-q">{{ T "home_search_label" }}</label>
+      <input id="home-q" name="q" type="search" placeholder="{{ T "finder_search_placeholder" }}">
+      <button type="submit" class="button">{{ T "home_search_submit" }}</button>
+    </form>
+    <ul class="chip-list">
+      {{- range .Pages.ByTitle }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+    </ul>
+    <p><a class="button" href="{{ .RelPermalink }}">{{ T "home_finder_link" }}</a></p>
+  </section>
+  {{- end }}
+
+  {{- with site.GetPage "/experts" }}
+  <section aria-labelledby="h-experts">
+    <h2 id="h-experts">{{ T "home_experts_heading" }}</h2>
+    <div class="card-grid">
+      {{- range partial "sorted-experts.html" .Pages }}
+      {{ partial "expert-card.html" (dict "page" .) }}
+      {{- end }}
+    </div>
+  </section>
+  {{- end }}
+
+  <section class="notice" aria-labelledby="h-disclaimer">
+    <h2 id="h-disclaimer">{{ T "home_disclaimer_heading" }}</h2>
+    <p>{{ T "disclaimer" }}</p>
+  </section>
 </div>
 {{ end }}

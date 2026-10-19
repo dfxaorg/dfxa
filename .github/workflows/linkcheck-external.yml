@@ -1,5 +1,7 @@
 # Weekly check of external links (JustizOnline, experts' websites, ...).
 # Non-blocking for pull requests; failures show up in the Actions tab.
+# The site's own URLs (https://dfxa.at/…, e.g. canonical and hreflang links)
+# are excluded: internal links are checked offline by ci.yml.
 name: External link check
 
 on:
@@ -28,6 +30,7 @@ jobs:
         with:
           args: >-
             --no-progress
+            --exclude "^https://dfxa\.at/"
             --root-dir "${{ github.workspace }}/public"
             "public/**/*.html"
           fail: true

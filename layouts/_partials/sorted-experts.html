@@ -1,0 +1,5 @@
+{{- /* Expert pages from a page collection, sorted alphabetically by surname
+       (never by any ranking). */ -}}
+{{- $experts := where . "Section" "experts" }}
+{{- $experts = where $experts "Kind" "page" }}
+{{- return (sort $experts "Params.family_name" "asc") -}}

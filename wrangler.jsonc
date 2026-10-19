@@ -1,0 +1,23 @@
+// Cloudflare Worker serving the static site (Workers static assets).
+// Built and deployed by Cloudflare Workers Builds (Git integration), see
+// docs/cloudflare.md. Build command: sh scripts/build-cloudflare.sh
+{
+  "name": "dfxa",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./public",
+    // Serves the nearest 404.html: /en/404.html below /en/, else /404.html.
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  },
+  // The site is served only on dfxa.at (no duplicate under *.workers.dev).
+  // www.dfxa.at, dfxa.eu and dfxa.org redirect via Cloudflare Redirect Rules.
+  "workers_dev": false,
+  // Previews of non-main branches on dev-dfxa.dfxa.workers.dev (public,
+  // noindex); with workers_dev off they are disabled unless enabled explicitly.
+  "preview_urls": true,
+  "previews": {},
+  "routes": [
+    { "pattern": "dfxa.at", "custom_domain": true }
+  ]
+}

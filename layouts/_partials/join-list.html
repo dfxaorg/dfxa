@@ -1,0 +1,9 @@
+{{- /* Joins a list of strings: "a, b und c" / "a, b and c". Returns a string. */ -}}
+{{- $n := len . }}
+{{- $out := "" }}
+{{- range $i, $s := . }}
+{{- if eq $i 0 }}{{ $out = $s }}
+{{- else if eq $i (sub $n 1) }}{{ $out = printf "%s %s %s" $out (T "list_and") $s }}
+{{- else }}{{ $out = printf "%s, %s" $out $s }}{{ end }}
+{{- end }}
+{{- return $out -}}

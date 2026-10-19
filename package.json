@@ -1,0 +1,16 @@
+{
+  "name": "dfxa-website",
+  "private": true,
+  "description": "Development checks for the DFXA website (the site itself is built with Hugo and has no npm dependencies).",
+  "scripts": {
+    "build:cloudflare": "sh scripts/build-cloudflare.sh",
+    "check:parity": "node scripts/check-language-parity.mjs",
+    "check:a11y": "node scripts/check-a11y.cjs",
+    "check:seo": "node scripts/check-seo.mjs",
+    "test:finder": "node scripts/test-finder.cjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.56.1"
+  }
+}

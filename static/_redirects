@@ -1,0 +1,7 @@
+# Redirects for the static site on Cloudflare Workers (static assets).
+# Domain-level redirects (www.dfxa.at, dfxa.eu, dfxa.org → dfxa.at) are
+# Cloudflare Redirect Rules, see docs/cloudflare.md.
+
+# German is served at the root; /de/ is only an alias. (No /de/* rule:
+# the German sitemap is published at /de/sitemap.xml.)
+/de/ / 301

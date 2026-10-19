@@ -1,0 +1,13 @@
+{{- /* Responsive WebP portrait of an expert, if the bundle contains an image
+       named portrait.* (1x and 2x). Params: page, width (CSS px, default 96),
+       eager (bool, for images above the fold). */ -}}
+{{- $p := .page }}
+{{- with $p.Resources.GetMatch "portrait.*" }}
+{{- $w := $.width | default 96 }}
+{{- $x1 := .Fill (printf "%dx%d webp q80 Center" $w $w) }}
+{{- $x2 := .Fill (printf "%dx%d webp q80 Center" (mul $w 2) (mul $w 2)) }}
+<img class="portrait" src="{{ $x1.RelPermalink }}" srcset="{{ $x1.RelPermalink }} 1x, {{ $x2.RelPermalink }} 2x"
+     width="{{ $w }}" height="{{ $w }}"
+     alt="{{ T "profile_portrait_alt" (dict "Name" (partial "expert-name.html" $p)) }}"
+     {{- if $.eager }} fetchpriority="high"{{ else }} loading="lazy"{{ end }} decoding="async">
+{{- end }}

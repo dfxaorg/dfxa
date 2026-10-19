@@ -1,0 +1,3 @@
+{{- with .Lastmod }}{{ if not .IsZero }}
+<p class="last-updated">{{ T "last_updated" }}: <time datetime="{{ .Format "2006-01-02" }}">{{ . | time.Format ":date_long" }}</time></p>
+{{- end }}{{ end }}

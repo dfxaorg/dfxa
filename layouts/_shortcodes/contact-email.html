@@ -1,0 +1,3 @@
+{{- /* Entity-encoded mailto link. Optional positional param: address
+       (defaults to the network address). */ -}}
+{{- partial "mailto.html" (dict "email" (.Get 0)) -}}

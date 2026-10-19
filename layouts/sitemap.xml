@@ -1,0 +1,23 @@
+{{- /* Per-language sitemap with hreflang alternates identical to the HTML
+       head (de, en, x-default → German). Excludes the 404 page. */ -}}
+{{ printf "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>" | safeHTML }}
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{{- range where .Pages "Sitemap.Disable" "ne" true }}
+{{- if and .Permalink (ne .Kind "404") }}
+  <url>
+    <loc>{{ .Permalink }}</loc>
+    {{- with .Lastmod }}{{ if not .IsZero }}
+    <lastmod>{{ .Format "2006-01-02T15:04:05-07:00" | safeHTML }}</lastmod>
+    {{- end }}{{ end }}
+    {{- if .IsTranslated }}
+    {{- range .AllTranslations }}
+    <xhtml:link rel="alternate" hreflang="{{ .Language.Lang }}" href="{{ .Permalink }}"/>
+    {{- end }}
+    {{- range .AllTranslations }}{{ if eq .Language.Lang "de" }}
+    <xhtml:link rel="alternate" hreflang="x-default" href="{{ .Permalink }}"/>
+    {{- end }}{{ end }}
+    {{- end }}
+  </url>
+{{- end }}
+{{- end }}
+</urlset>

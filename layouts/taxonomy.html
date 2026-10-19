@@ -2,10 +2,8 @@
 <div class="container">
   <h1>{{ .Title }}</h1>
   {{ .Content }}
-  {{ with .Pages }}
-  <ul>
-    {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+  <ul class="link-list">
+    {{- range .Pages.ByWeight }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
   </ul>
-  {{ end }}
 </div>
 {{ end }}

@@ -1,0 +1,50 @@
+{{ define "main" }}
+<article class="container service">
+  {{ partial "breadcrumbs.html" . }}
+  <h1>{{ .Title }}</h1>
+  {{- with .Params.domain }}
+  <p class="service__domain">{{ T "service_domain" }}: <a href="{{ with site.GetPage (printf "/domains/%s" .) }}{{ .RelPermalink }}{{ end }}">{{ partial "term-title.html" (dict "taxonomy" "domains" "key" .) }}</a></p>
+  {{- end }}
+
+  {{ .Content }}
+
+  {{- with .Params.typical_audiences }}
+  <section aria-labelledby="h-audiences">
+    <h2 id="h-audiences">{{ T "service_audiences" }}</h2>
+    <ul>
+      {{- range . }}<li>{{ partial "term-title.html" (dict "taxonomy" "audiences" "key" .) }}</li>{{ end }}
+    </ul>
+  </section>
+  {{- end }}
+
+  {{- with .Params.result }}
+  <section aria-labelledby="h-result">
+    <h2 id="h-result">{{ T "service_result" }}</h2>
+    {{ . | $.RenderString (dict "display" "block") }}
+  </section>
+  {{- end }}
+
+  <section aria-labelledby="h-experts">
+    <h2 id="h-experts">{{ T "service_experts" }}</h2>
+    <p>{{ T "service_experts_intro" }}</p>
+    <div class="card-grid">
+      {{- range partial "sorted-experts.html" .Pages }}
+      {{ partial "expert-card.html" (dict "page" . "service" $) }}
+      {{- end }}
+    </div>
+    <p class="contact__note">{{ partial "obfuscate-address.html" (T "contact_note") }}</p>
+  </section>
+
+  {{- with .Params.faq }}
+  <section class="faq" aria-labelledby="h-faq">
+    <h2 id="h-faq">{{ T "service_faq" }}</h2>
+    {{- range . }}
+    <h3>{{ .question }}</h3>
+    <p>{{ .answer }}</p>
+    {{- end }}
+  </section>
+  {{- end }}
+
+  {{ partial "last-updated.html" . }}
+</article>
+{{ end }}

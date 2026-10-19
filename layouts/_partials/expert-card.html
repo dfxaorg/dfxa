@@ -1,0 +1,28 @@
+{{- /* Expert card. Params: page (expert), service (term page, optional),
+       level (heading level of the name, default 3).
+       With a service: shows the court fields and a contact button whose
+       subject names expert and service. */ -}}
+{{- $p := .page }}
+{{- $name := partial "expert-name.html" $p }}
+{{- $h := printf "h%d" (.level | default 3) }}
+<article class="card expert-card">
+  {{- partial "portrait.html" (dict "page" $p "width" 88) }}
+  <div class="card__body">
+    {{ printf "<%s class=\"card__title\">" $h | safeHTML }}<a href="{{ $p.RelPermalink }}">{{ $p.Title }}</a>{{ printf "</%s>" $h | safeHTML }}
+    {{- if .service }}
+    {{- with partial "court-fields.html" $p }}
+    <p class="card__meta">{{ T "card_court_fields" }}: {{ delimit . ", " }}</p>
+    {{- end }}
+    <p class="card__action">{{ partial "mailto.html" (dict
+      "subject" (T "contact_subject_expert_service" (dict "Name" $name "Service" .service.LinkTitle))
+      "text" (T "contact_expert" (dict "Name" $name))
+      "class" "button") }}</p>
+    {{- else }}
+    {{- with $p.Params.services }}
+    <p class="card__meta">{{ T "card_services" }}:
+      {{ $titles := slice }}{{ range . }}{{ $titles = $titles | append (partial "term-title.html" (dict "taxonomy" "services" "key" .)) }}{{ end }}
+      {{- delimit (sort $titles) ", " }}</p>
+    {{- end }}
+    {{- end }}
+  </div>
+</article>
